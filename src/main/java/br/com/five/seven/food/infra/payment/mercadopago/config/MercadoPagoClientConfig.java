@@ -17,7 +17,7 @@ public class MercadoPagoClientConfig {
         return requestTemplate -> requestTemplate.header("Authorization", "Bearer " + jwtToken);
     }
 
-    @Bean
+    @Bean("mercadoPagoClientFeignLoggerLevel")
     Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
     }
