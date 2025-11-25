@@ -1,12 +1,11 @@
 package br.com.five.seven.food.rest;
 
 import br.com.five.seven.food.rest.mapper.PaymentMapper;
-import br.com.five.seven.food.rest.request.NotificationRequest;
 import br.com.five.seven.food.rest.response.PaymentOrderResponse;
 import br.com.five.seven.food.rest.request.PaymentRequest;
-import br.com.five.seven.food.application.ports.in.PaymentNotificationUseCase;
 import br.com.five.seven.food.application.ports.in.PaymentUseCase;
 import br.com.five.seven.food.infra.annotations.payment.*;
+import br.com.five.seven.food.infra.orders.http.OrdersClient;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentUseCase paymentOrderServiceIn;
+    private final OrdersClient ordersClient;
     private final PaymentMapper paymentOrderMapper;
 
 
@@ -39,6 +39,15 @@ public class PaymentController {
     @SwaggerCreatePaymentQRCodePix
     @PostMapping
     public ResponseEntity<PaymentOrderResponse> createPaymentQRCodePix(@Valid @RequestBody PaymentRequest paymentRequest) {
+
+        var order = ordersClient.getOrderById(paymentRequest.orderId()).getBody();
+
+        if(order == null){
+            throw new IllegalArgumentException("Order not found");
+        }
+
+        System.out.println("order: " + order.getClient());
+
         var paymentOrder = paymentOrderServiceIn.createPaymentQRCodePix(paymentRequest.email(), paymentRequest.orderId(), paymentRequest.totalAmount());
         return ResponseEntity.ok(paymentOrderMapper.toResponse(paymentOrder));
     }
