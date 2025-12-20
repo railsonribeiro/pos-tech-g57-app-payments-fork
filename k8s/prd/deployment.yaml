@@ -13,7 +13,6 @@ spec:
       labels:
         app: api-food-payments
     spec:
-      serviceAccountName: payments-service-account
       containers:
         - name: api-food-payments
           image: postechf57/pos-tech-g57-app-payments:0.0.16
