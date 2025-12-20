@@ -43,7 +43,7 @@ public class DynamoDBConfig {
     }
 
     @Bean
-    @Profile("local")
+    @Profile("local & !test")
     public DynamoDbClient dynamoDbClientLocal(@Value("${aws.dynamodb.endpoint}") String amazonDynamoDBEndpoint) {
         log.info("========================================");
         log.info("Using DynamoDB LOCAL configuration");
@@ -74,6 +74,7 @@ public class DynamoDBConfig {
     }
 
     @Bean
+    @Profile("!test")
     public DynamoDbEnhancedClient dynamoDbEnhancedClient(DynamoDbClient dynamoDbClient) {
         log.info("Creating DynamoDbEnhancedClient with custom DynamoDbClient");
         log.info("DynamoDbClient class: {}", dynamoDbClient.getClass().getName());
@@ -83,6 +84,7 @@ public class DynamoDBConfig {
     }
 
     @Bean
+    @Profile("!test")
     public DynamoDbTemplate dynamoDbTemplate(DynamoDbEnhancedClient dynamoDbEnhancedClient) {
         log.info("Creating DynamoDbTemplate with EnhancedClient");
         DynamoDbTemplate template = new DynamoDbTemplate(dynamoDbEnhancedClient);

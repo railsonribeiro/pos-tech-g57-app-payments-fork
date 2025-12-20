@@ -1,11 +1,13 @@
 spring:
-  profiles:
-    active: ${ENVIRONMENT_PROFILE_VALUE:prod}
+  config:
+    import:
+      - aws-secretsmanager:production/db/geral
+      - aws-secretsmanager:production/payments
   application:
     name: api-food-payments
     payment-integration:
       host1: ${PAYMENT_INTEGRATION_HOST:https://api.mercadopago.com}
-      token: ${JWT_TOKEN_PIX_APPLICATION_PAYMENT:defaulttoken}
+      token: ${JWT_TOKEN_PIX_APPLICATION_PAYMENT}
     orders-client:
       host1: ${ORDERS_CLIENT_HOST:http://api-food-orders-service.orders}
     users-client:

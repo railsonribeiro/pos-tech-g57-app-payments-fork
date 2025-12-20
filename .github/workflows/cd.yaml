@@ -4,7 +4,39 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  setup-aws-secrets:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_NAME: "production/payments"
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Setup AWS Secrets Manager
+        run: |
+          SECRET_VALUE='{"JWT_TOKEN_PIX_APPLICATION_PAYMENT":"${{ secrets.JWT_TOKEN_PIX_APPLICATION_PAYMENT }}"}'
+          
+          # Check if secret exists
+          if aws secretsmanager describe-secret --secret-id "$SECRET_NAME" 2>/dev/null; then
+            echo "Secret exists, updating..."
+            aws secretsmanager update-secret \
+              --secret-id "$SECRET_NAME" \
+              --secret-string "$SECRET_VALUE"
+          else
+            echo "Secret does not exist, creating..."
+            aws secretsmanager create-secret \
+              --name "$SECRET_NAME" \
+              --secret-string "$SECRET_VALUE"
+          fi
+          
+          echo "Secret $SECRET_NAME successfully configured"
+
   call-reusable-deploy-workflow:
+    needs: setup-aws-secrets
     uses: railsonribeiro/nested-reusable-java-maven-eks-fork/.github/workflows/deploy.yml@main
     with:
       cluster_name: "eks-postech-g57-railson"
