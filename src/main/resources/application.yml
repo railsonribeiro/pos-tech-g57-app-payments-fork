@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ${ENVIRONMENT_PROFILE_VALUE:prod}
+    active: ${ENVIRONMENT_PROFILE_VALUE:prd}
   application:
     name: api-food-payments
     payment-integration:
@@ -19,9 +19,9 @@ logging:
 
 # AWS Configuration
 aws:
-  region: ${AWS_REGION:us-east-1}
-  accesskey: ${AWS_ACCESS_KEY_ID}
-  secretkey: ${AWS_SECRET_ACCESS_KEY}
+  region: us-east-1
+  accesskey: dummykey
+  secretkey: dummysecret
 
 # API Documentation
 springdoc:

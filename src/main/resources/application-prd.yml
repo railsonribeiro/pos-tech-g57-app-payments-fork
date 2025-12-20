@@ -9,24 +9,11 @@ spring:
     users-client:
       host1: ${USERS_CLIENT_HOST:http://api-food-users-service.users}
 
-logging:
-  level:
-    root: ${LOG_LEVEL:INFO}
-    org.springframework: ${SPRING_LOG_LEVEL:INFO}
-    br.com.five.seven.food: ${APP_LOG_LEVEL:DEBUG}
-
 # AWS Configuration
 aws:
   region: ${AWS_REGION:us-east-1}
   accesskey: ${AWS_ACCESS_KEY_ID}
   secretkey: ${AWS_SECRET_ACCESS_KEY}
-
-# API Documentation
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
 
 user: ${ADMIN_USER:admin}
 pass: ${ADMIN_PASS:admin}
