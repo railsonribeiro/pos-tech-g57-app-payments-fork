@@ -3,18 +3,39 @@ name: CD
 on:
   workflow_dispatch: {}
 
+env:
+  CLUSTER_NAME: "eks-postech-g57-railson"
+  AWS_REGION: "us-east-1"
+  NAMESPACE: "payments"
+
 jobs:
   setup-aws-secrets:
     runs-on: ubuntu-latest
     env:
       SECRET_NAME: "production/payments"
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Get AWS Account ID and Role ARN
+        id: aws-info
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
+          
+          # Buscar a role de secrets manager dinamicamente
+          ROLE_ARN=$(aws iam list-roles --query "Roles[?contains(RoleName, '${{ env.CLUSTER_NAME }}') && contains(RoleName, 'secrets-manager')].Arn | [0]" --output text)
+          echo "role_arn=$ROLE_ARN" >> $GITHUB_OUTPUT
+          
+          echo "AWS Account ID: $ACCOUNT_ID"
+          echo "Role ARN: $ROLE_ARN"
       
       - name: Setup AWS Secrets Manager
         run: |
@@ -34,6 +55,29 @@ jobs:
           fi
           
           echo "Secret $SECRET_NAME successfully configured"
+      
+      - name: Update and Apply ServiceAccount
+        run: |
+          # Obter o ARN da role
+          ROLE_ARN="${{ steps.aws-info.outputs.role_arn }}"
+          echo "Role ARN a ser usado: $ROLE_ARN"
+          
+          # Substituir variável no template usando sed (mais confiável)
+          sed "s|\${AWS_ROLE_ARN}|${ROLE_ARN}|g" k8s/prd/serviceaccount.yaml > /tmp/serviceaccount.yaml
+          
+          echo "ServiceAccount manifest:"
+          cat /tmp/serviceaccount.yaml
+          
+          # Configurar kubectl
+          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+          
+          # Aplicar ServiceAccount
+          kubectl apply -f /tmp/serviceaccount.yaml
+          
+          # Reiniciar deployment para pegar a nova ServiceAccount
+          kubectl rollout restart deployment -n ${{ env.NAMESPACE }} || true
+          
+          echo "ServiceAccount applied successfully"
 
   call-reusable-deploy-workflow:
     needs: setup-aws-secrets
