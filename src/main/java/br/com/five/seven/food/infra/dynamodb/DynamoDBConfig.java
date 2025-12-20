@@ -35,11 +35,13 @@ public class DynamoDBConfig {
         log.info("Region: {}", amazonAWSRegion);
         log.info("AWS_ACCESS_KEY_ID: {}", amazonAWSAccessKey);
         log.info("AWS_SECRET_ACCESS_KEY: {}", amazonAWSSecretKey != null ? amazonAWSSecretKey.substring(0, Math.min(4, amazonAWSSecretKey.length())) + "***" : "null");
-        log.info("Using DefaultCredentialsProvider (IRSA)");
+        log.info("Using StaticCredentialsProvider (Secrets Manager)");
         log.info("========================================");
         
         return DynamoDbClient.builder()
                 .region(Region.of(amazonAWSRegion))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(amazonAWSAccessKey, amazonAWSSecretKey)))
                 .build();
     }
 
