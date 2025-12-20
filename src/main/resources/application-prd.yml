@@ -1,7 +1,4 @@
 spring:
-  config:
-    import:
-      - optional:aws-secretsmanager:production/payments
   application:
     name: api-food-payments
     payment-integration:
