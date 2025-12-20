@@ -62,20 +62,19 @@ jobs:
           ROLE_ARN="${{ steps.aws-info.outputs.role_arn }}"
           echo "Role ARN a ser usado: $ROLE_ARN"
           
-          # Substituir variável no template usando sed (mais confiável)
-          sed "s|\${AWS_ROLE_ARN}|${ROLE_ARN}|g" k8s/prd/serviceaccount.yaml > /tmp/serviceaccount.yaml
-          
-          echo "ServiceAccount manifest:"
-          cat /tmp/serviceaccount.yaml
-          
           # Configurar kubectl
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
           
-          # Aplicar ServiceAccount
-          kubectl apply -f /tmp/serviceaccount.yaml
-          
-          # Reiniciar deployment para pegar a nova ServiceAccount
-          kubectl rollout restart deployment -n ${{ env.NAMESPACE }} || true
+          # Criar ServiceAccount diretamente via kubectl (sem arquivo template)
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: ${{ env.NAMESPACE }}-service-account
+            namespace: ${{ env.NAMESPACE }}
+            annotations:
+              eks.amazonaws.com/role-arn: ${ROLE_ARN}
+          EOF
           
           echo "ServiceAccount applied successfully"
 

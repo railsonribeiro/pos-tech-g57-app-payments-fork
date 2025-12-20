@@ -33,6 +33,8 @@ public class DynamoDBConfig {
         log.info("========================================");
         log.info("Using DynamoDB PRODUCTION configuration");
         log.info("Region: {}", amazonAWSRegion);
+        log.info("AWS_ACCESS_KEY_ID: {}", amazonAWSAccessKey);
+        log.info("AWS_SECRET_ACCESS_KEY: {}", amazonAWSSecretKey != null ? amazonAWSSecretKey.substring(0, Math.min(4, amazonAWSSecretKey.length())) + "***" : "null");
         log.info("Using DefaultCredentialsProvider (IRSA)");
         log.info("========================================");
         

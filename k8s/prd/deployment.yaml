@@ -16,7 +16,7 @@ spec:
       serviceAccountName: payments-service-account
       containers:
         - name: api-food-payments
-          image: postechf57/pos-tech-g57-app-payments:0.0.2
+          image: postechf57/pos-tech-g57-app-payments:0.0.7
           ports:
             - containerPort: 8080
           envFrom:
