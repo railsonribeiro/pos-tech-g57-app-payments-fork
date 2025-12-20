@@ -21,10 +21,10 @@ public class DynamoDBConfig {
     @Value("${aws.region:us-east-1}")
     private String amazonAWSRegion;
 
-    @Value("${aws.accesskey:dummykey}")
+    @Value("${aws.accesskey}")
     private String amazonAWSAccessKey;
 
-    @Value("${aws.secretkey:dummysecret}")
+    @Value("${aws.secretkey}")
     private String amazonAWSSecretKey;
 
     @Bean
