@@ -1,7 +1,10 @@
 name: CD
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch: {}
@@ -13,6 +16,7 @@ env:
 
 jobs:
   setup-aws-secrets-manager:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       SECRET_NAME: "production/payments"
