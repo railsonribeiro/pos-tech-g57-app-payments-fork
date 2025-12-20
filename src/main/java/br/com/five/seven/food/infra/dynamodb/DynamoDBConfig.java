@@ -17,7 +17,7 @@ import java.net.URI;
 @Slf4j
 @Configuration
 public class DynamoDBConfig {
-    
+
     @Value("${aws.region:us-east-1}")
     private String amazonAWSRegion;
 
@@ -33,11 +33,17 @@ public class DynamoDBConfig {
         log.info("========================================");
         log.info("Using DynamoDB PRODUCTION configuration");
         log.info("Region: {}", amazonAWSRegion);
-        log.info("AWS_ACCESS_KEY_ID: {}", amazonAWSAccessKey);
-        log.info("AWS_SECRET_ACCESS_KEY: {}", amazonAWSSecretKey != null ? amazonAWSSecretKey.substring(0, Math.min(4, amazonAWSSecretKey.length())) + "***" : "null");
-        log.info("Using StaticCredentialsProvider (Secrets Manager)");
+        log.info("AWS_ACCESS_KEY_ID: {}",
+                amazonAWSAccessKey != null
+                        ? amazonAWSAccessKey.substring(0, Math.min(4, amazonAWSAccessKey.length())) + "***"
+                        : "null");
+        log.info("AWS_SECRET_ACCESS_KEY: {}",
+                amazonAWSSecretKey != null
+                        ? amazonAWSSecretKey.substring(0, Math.min(4, amazonAWSSecretKey.length())) + "***"
+                        : "null");
+        log.info("Using StaticCredentialsProvider (K8s Secret)");
         log.info("========================================");
-        
+
         return DynamoDbClient.builder()
                 .region(Region.of(amazonAWSRegion))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -53,26 +59,26 @@ public class DynamoDBConfig {
         log.info("Endpoint: {}", amazonDynamoDBEndpoint);
         log.info("Region: {}", amazonAWSRegion);
         log.info("========================================");
-        
+
         DynamoDbClient client = DynamoDbClient.builder()
                 .endpointOverride(URI.create(amazonDynamoDBEndpoint))
                 .region(Region.of(amazonAWSRegion))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(amazonAWSAccessKey, amazonAWSSecretKey)))
                 .build();
-        
+
         try {
             log.info("Testing DynamoDB connection...");
             var tables = client.listTables();
             log.info("Connected successfully! Available tables: {}", tables.tableNames());
-            
+
             // Test describe table
             var describeResponse = client.describeTable(r -> r.tableName("PaymentOrderEntity"));
             log.info("Table PaymentOrderEntity status: {}", describeResponse.table().tableStatus());
         } catch (Exception e) {
             log.error("Failed to connect to DynamoDB: {}", e.getMessage(), e);
         }
-        
+
         return client;
     }
 

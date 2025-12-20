@@ -1,8 +1,7 @@
 spring:
   config:
     import:
-      - aws-secretsmanager:production/db/geral
-      - aws-secretsmanager:production/payments
+      - optional:aws-secretsmanager:production/payments
   application:
     name: api-food-payments
     payment-integration:

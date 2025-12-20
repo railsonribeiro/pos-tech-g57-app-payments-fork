@@ -16,14 +16,14 @@ spec:
       serviceAccountName: payments-service-account
       containers:
         - name: api-food-payments
-          image: postechf57/pos-tech-g57-app-payments:0.0.8
+          image: postechf57/pos-tech-g57-app-payments:0.0.9
           ports:
             - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: api-config-payments
             - secretRef:
-                name: api-secret
+                name: aws-access-secret
           resources:
             requests:
               cpu: "100m"

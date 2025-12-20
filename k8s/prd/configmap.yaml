@@ -7,10 +7,4 @@ data:
   PAYMENT_INTEGRATION_HOST: "https://api.mercadopago.com/"
   SPRING_PROFILES_ACTIVE: "prod"
   AWS_REGION: "us-east-1"
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: api-secret
-data: {}
-type: Opaque
+

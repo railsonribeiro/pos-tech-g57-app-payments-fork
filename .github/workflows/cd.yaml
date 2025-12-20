@@ -9,7 +9,7 @@ env:
   NAMESPACE: "payments"
 
 jobs:
-  setup-aws-secrets:
+  setup-aws-secrets-manager:
     runs-on: ubuntu-latest
     env:
       SECRET_NAME: "production/payments"
@@ -23,27 +23,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      
-      - name: Get AWS Account ID and Role ARN
-        id: aws-info
-        run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
-          
-          # Buscar a role de secrets manager - nome fixo baseado no cluster
-          ROLE_NAME="${{ env.CLUSTER_NAME }}-secrets-manager-access"
-          ROLE_ARN=$(aws iam get-role --role-name "$ROLE_NAME" --query "Role.Arn" --output text 2>/dev/null || echo "")
-          
-          if [ -z "$ROLE_ARN" ] || [ "$ROLE_ARN" == "None" ]; then
-            echo "ERROR: Role $ROLE_NAME not found!"
-            exit 1
-          fi
-          
-          echo "role_arn=$ROLE_ARN" >> $GITHUB_OUTPUT
-          
-          echo "AWS Account ID: $ACCOUNT_ID"
-          echo "Role ARN: $ROLE_ARN"
-      
+    
       - name: Setup AWS Secrets Manager
         run: |
           SECRET_VALUE='{"JWT_TOKEN_PIX_APPLICATION_PAYMENT":"${{ secrets.JWT_TOKEN_PIX_APPLICATION_PAYMENT }}"}'
@@ -61,32 +41,10 @@ jobs:
               --secret-string "$SECRET_VALUE"
           fi
           
-          echo "Secret $SECRET_NAME successfully configured"
+          echo "Secret $SECRET_NAME successfully configured in AWS Secrets Manager"
       
-      - name: Update and Apply ServiceAccount
-        run: |
-          # Obter o ARN da role
-          ROLE_ARN="${{ steps.aws-info.outputs.role_arn }}"
-          echo "Role ARN a ser usado: $ROLE_ARN"
-          
-          # Configurar kubectl
-          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-          
-          # Criar ServiceAccount diretamente via kubectl (sem arquivo template)
-          cat <<EOF | kubectl apply -f -
-          apiVersion: v1
-          kind: ServiceAccount
-          metadata:
-            name: ${{ env.NAMESPACE }}-service-account
-            namespace: ${{ env.NAMESPACE }}
-            annotations:
-              eks.amazonaws.com/role-arn: ${ROLE_ARN}
-          EOF
-          
-          echo "ServiceAccount applied successfully"
-
   call-reusable-deploy-workflow:
-    needs: setup-aws-secrets
+    needs: setup-aws-secrets-manager
     uses: railsonribeiro/nested-reusable-java-maven-eks-fork/.github/workflows/deploy.yml@main
     with:
       cluster_name: "eks-postech-g57-railson"
