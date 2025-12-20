@@ -20,8 +20,8 @@ logging:
 # AWS Configuration
 aws:
   region: ${AWS_REGION:us-east-1}
-  accesskey: ${AWS_ACCESS_KEY:dummykey}
-  secretkey: ${AWS_SECRET_KEY:dummysecret}
+  accesskey: ${AWS_ACCESS_KEY_ID}
+  secretkey: ${AWS_SECRET_ACCESS_KEY}
 
 # API Documentation
 springdoc:
