@@ -28,7 +28,7 @@ public class DynamoDBConfig {
     private String amazonAWSSecretKey;
 
     @Bean
-    @Profile("prod")
+    @Profile("prd")
     public DynamoDbClient dynamoDbClient() {
         log.info("========================================");
         log.info("Using DynamoDB PRODUCTION configuration");
