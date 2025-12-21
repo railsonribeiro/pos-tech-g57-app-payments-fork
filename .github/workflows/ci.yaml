@@ -7,13 +7,9 @@ on:
       - 'k8s/**'
   workflow_dispatch: {}
 
-env:
-  app_name: "pos-tech-g57-app-payments"
-
 jobs:
   call-reusable-build-and-test-workflow:
     uses: railsonribeiro/nested-reusable-java-maven-eks-fork/.github/workflows/build.yml@main
     with:
-      app_name: ${{ env.app_name }}
+      app_name: "pos-tech-g57-app-payments"
     secrets: inherit
-    

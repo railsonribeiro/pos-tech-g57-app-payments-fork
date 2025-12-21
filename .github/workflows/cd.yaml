@@ -7,10 +7,6 @@ on:
 
 env:
   AWS_REGION: "us-east-1"
-  CLUSTER_NAME: "eks-postech-g57-railson"
-  NAMESPACE: "payments"
-  GIT_REPO_URL: "https://github.com/railsonribeiro/pos-tech-g57-app-payments-forked"
-  ARGO_APP_NAME: "payments-api"
 jobs:
   configure-api-secrets:
     runs-on: ubuntu-latest
@@ -50,8 +46,8 @@ jobs:
     needs: configure-api-secrets
     uses: railsonribeiro/nested-reusable-java-maven-eks-fork/.github/workflows/deploy.yml@main
     with:
-      cluster_name: ${{ env.CLUSTER_NAME }}
-      namespace: ${{ env.NAMESPACE }}
-      git_repo_url: ${{ env.GIT_REPO_URL }}
-      argo_app_name: ${{ env.ARGO_APP_NAME }}
+      cluster_name: "eks-postech-g57-railson"
+      namespace: "payments"
+      git_repo_url: "https://github.com/railsonribeiro/pos-tech-g57-app-payments-forked"
+      argo_app_name: "payments-api"
     secrets: inherit
