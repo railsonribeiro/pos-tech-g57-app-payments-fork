@@ -11,7 +11,7 @@ env:
   NAMESPACE: "payments"
 
 jobs:
-  setup-aws-secrets-manager:
+  configure-api-secrets:
     runs-on: ubuntu-latest
     env:
       SECRET_NAME: "production/payments"
@@ -46,7 +46,7 @@ jobs:
           echo "Secret $SECRET_NAME successfully configured in AWS Secrets Manager"
       
   call-reusable-deploy-workflow:
-    needs: setup-aws-secrets-manager
+    needs: configure-api-secrets
     uses: railsonribeiro/nested-reusable-java-maven-eks-fork/.github/workflows/deploy.yml@main
     with:
       cluster_name: "eks-postech-g57-railson"
