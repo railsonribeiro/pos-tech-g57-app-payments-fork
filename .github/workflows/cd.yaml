@@ -12,7 +12,7 @@ jobs:
   configure-api-secrets:
     runs-on: ubuntu-latest
     env:
-      SECRET_NAME: "production/payments"
+      SECRET_NAME: "production/payments2"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
