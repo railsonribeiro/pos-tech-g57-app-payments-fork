@@ -49,6 +49,6 @@ jobs:
     with:
       cluster_name: "eks-postech-g57-railson"
       namespace: "payments"
-      git_repo_url: "https://github.com/railsonribeiro/pos-tech-g57-app-payments-forked"
+      git_repo_url: "https://github.com/railsonribeiro/pos-tech-g57-app-payments-fork"
       argo_app_name: "payments-api"
     secrets: inherit
