@@ -73,8 +73,8 @@ public class DynamoDBConfig {
             log.info("Connected successfully! Available tables: {}", tables.tableNames());
 
             // Test describe table
-            var describeResponse = client.describeTable(r -> r.tableName("PaymentOrderEntity"));
-            log.info("Table PaymentOrderEntity status: {}", describeResponse.table().tableStatus());
+            var describeResponse = client.describeTable(r -> r.tableName("payment_order_entity"));
+            log.info("Table payment_order_entity status: {}", describeResponse.table().tableStatus());
         } catch (Exception e) {
             log.error("Failed to connect to DynamoDB: {}", e.getMessage(), e);
         }
