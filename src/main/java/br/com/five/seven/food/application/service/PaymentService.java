@@ -110,10 +110,10 @@ public class PaymentService
 
     @Override
     public String getEmailByUserCpf(String cpf) {
-        var userResponse = usersClientOut.getUserByCpf(cpf);
-        if (userResponse == null) {
+        if (cpf == null || cpf.isBlank()) {
             return PaymentService.DEFAULT_EMAIL;
         }
+        var userResponse = usersClientOut.getUserByCpf(cpf);
 
         return userResponse.getEmail();
     }
